@@ -242,7 +242,7 @@ class Decimal implements JsonSerializable
         $decimal = static::create($value);
         $scale = max($this->scale(), $decimal->scale());
 
-        return bccomp($this, $decimal, $scale);
+        return bccomp((string)$this, (string)$decimal, $scale);
     }
 
     /**
@@ -258,7 +258,7 @@ class Decimal implements JsonSerializable
         $decimal = static::create($value);
         $scale = $this->resultScale($this, $decimal, $scale);
 
-        return new static(bcadd($this, $decimal, $scale));
+        return new static(bcadd((string)$this, (string)$decimal, $scale));
     }
 
     /**
@@ -296,7 +296,7 @@ class Decimal implements JsonSerializable
         $decimal = static::create($value);
         $scale = $this->resultScale($this, $decimal, $scale);
 
-        return new static(bcsub($this, $decimal, $scale));
+        return new static(bcsub((string)$this, (string)$decimal, $scale));
     }
 
     /**
@@ -406,7 +406,7 @@ class Decimal implements JsonSerializable
             $scale = $this->scale() + $decimal->scale();
         }
 
-        return new static(bcmul($this, $decimal, $scale));
+        return new static(bcmul((string)$this, (string)$decimal, $scale));
     }
 
     /**
@@ -426,7 +426,7 @@ class Decimal implements JsonSerializable
             throw new DivisionByZeroError('Cannot divide by zero. Only Chuck Norris can!');
         }
 
-        return new static(bcdiv($this, $decimal, $scale));
+        return new static(bcdiv((string)$this, (string)$decimal, $scale));
     }
 
     /**
@@ -443,7 +443,7 @@ class Decimal implements JsonSerializable
             $scale = $this->scale();
         }
 
-        return new static(bcpow($this, (string)$exponent, $scale));
+        return new static(bcpow((string)$this, (string)$exponent, $scale));
     }
 
     /**
@@ -459,7 +459,7 @@ class Decimal implements JsonSerializable
             $scale = $this->scale();
         }
 
-        return new static(bcsqrt($this, $scale));
+        return new static(bcsqrt((string)$this, $scale));
     }
 
     /**
@@ -476,10 +476,10 @@ class Decimal implements JsonSerializable
             $scale = $this->scale();
         }
         if (version_compare(PHP_VERSION, '7.2') < 0) {
-            return new static(bcmod($this, (string)$value));
+            return new static(bcmod((string)$this, (string)$value));
         }
 
-        return new static(bcmod($this, (string)$value, $scale));
+        return new static(bcmod((string)$this, (string)$value, $scale));
     }
 
     /**
@@ -495,16 +495,16 @@ class Decimal implements JsonSerializable
         $e = bcpow('10', (string)$exponent);
         switch ($roundMode) {
             case static::ROUND_FLOOR:
-                $v = bcdiv(bcadd(bcmul($this, $e, 0), $this->isNegative() ? '-9' : '0'), $e, 0);
+                $v = bcdiv(bcadd(bcmul((string)$this, $e, 0), $this->isNegative() ? '-9' : '0'), $e, 0);
 
                 break;
             case static::ROUND_CEIL:
-                $v = bcdiv(bcadd(bcmul($this, $e, 0), $this->isNegative() ? '0' : '9'), $e, 0);
+                $v = bcdiv(bcadd(bcmul((string)$this, $e, 0), $this->isNegative() ? '0' : '9'), $e, 0);
 
                 break;
             case static::ROUND_HALF_UP:
             default:
-                $v = bcdiv(bcadd(bcmul($this, $e, 0), $this->isNegative() ? '-5' : '5'), $e, $scale);
+                $v = bcdiv(bcadd(bcmul((string)$this, $e, 0), $this->isNegative() ? '-5' : '5'), $e, $scale);
         }
 
         return new static($v);
@@ -831,14 +831,14 @@ class Decimal implements JsonSerializable
         } else {
             $this->integralPart = bcmul($matches[2], bcpow('10', (string)$exp));
 
-            $pos = strlen((string)$this->integralPart);
+            $pos = strlen($this->integralPart);
             if (strpos($value, '.') !== false) {
                 $pos++;
             }
             $this->fractionalPart = rtrim(substr($value, $pos), '.');
 
             if ($scale !== null) {
-                $this->fractionalPart = str_pad($this->fractionalPart, $scale - strlen((string)$this->integralPart), '0');
+                $this->fractionalPart = str_pad($this->fractionalPart, $scale - strlen($this->integralPart), '0');
             }
         }
     }
